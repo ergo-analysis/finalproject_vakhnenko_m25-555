@@ -1,0 +1,36 @@
+[project]
+name = "finalproject-vakhnenko-m25-555"
+version = "0.1.0"
+description = ""
+authors = [
+    {name = "Egor",email = "egor.vakhnenko@mail.ru"}
+]
+
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "prettytable (>=3.16.0,<4.0.0)",
+    "requests (>=2.32.5,<3.0.0)",
+    "dotenv (>=0.9.9,<0.10.0)"
+]
+
+[tool.poetry]
+packages = [
+     { include = "valutatrade_hub", from = "." },
+ ]
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.scripts]
+project = "main:main"
+
+[tool.ruff]
+line-length = 150
+target-version = "py312"
+exclude = ["venv", ".venv", "dist", "__pycache__"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+ignore = []
