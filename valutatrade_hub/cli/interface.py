@@ -196,7 +196,6 @@ def get_rate(args: dict) -> str:
 
 
 def execute_command(command_line: str) -> str:
-    """Выполняет команду и возвращает результат"""
     if not command_line.strip():
         return ""
     
@@ -208,34 +207,36 @@ def execute_command(command_line: str) -> str:
         command = args_list[0]
         parsed_args = parse_args(args_list[1:])
         
-        if command == "register":
-            return register(parsed_args)
-        elif command == "login":
-            return login(parsed_args)
-        elif command == "logout":
-            return logout(parsed_args)
-        elif command == "show-portfolio":
-            return show_portfolio(parsed_args)
-        elif command == "buy":
-            return buy(parsed_args)
-        elif command == "sell":
-            return sell(parsed_args)
-        elif command == "get-rate":
-            return get_rate(parsed_args)
-        elif command == "help":
-            print_help()
-            return ""
-        elif command in ["exit", "quit"]:
-            if SessionManager.is_logged_in():
-                username = SessionManager.get_current_username()
-                SessionManager.logout()
-                return f"Вы вышли из системы. До свидания, {username}!"
-            return "До свидания!"
-        else:
-            return f"Неизвестная команда: {command}. Введите 'help' для списка команд."
+        match command:
+            case "register":
+                return register(parsed_args)
+            case "login":
+                return login(parsed_args)
+            case "logout":
+                return logout(parsed_args)
+            case "show-portfolio":
+                return show_portfolio(parsed_args)
+            case "buy":
+                return buy(parsed_args)
+            case "sell":
+                return sell(parsed_args)
+            case "get-rate":
+                return get_rate(parsed_args)
+            case "help":
+                show_help()
+                return ""
+            case "exit" | "quit":
+                if SessionManager.is_logged_in():
+                    username = SessionManager.get_current_username()
+                    SessionManager.logout()
+                    return f"Вы вышли из системы. До свидания, {username}!"
+                return "До свидания!"
+            case _:
+                return f"Неизвестная команда: {command}. Введите 'help' для списка команд."
     
     except Exception as e:
         return f"Ошибка выполнения команды: {str(e)}"
+
 
 
 def main():
