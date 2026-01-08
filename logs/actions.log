@@ -1,0 +1,4 @@
+INFO 2026-01-08T12:46:21 BUY user_id=123 currency='BTC' amount=0.0500 rate=59300.50 cost=2965.03 result=OK
+INFO 2026-01-08T12:46:21 REGISTER username='alice' result=OK
+INFO 2026-01-08T12:46:21 LOGIN username='bob' result=OK
+INFO 2026-01-08T12:46:21 SELL user_id=456 currency='ETH' amount=0.1000 rate=3720.00 revenue=372.00 result=OK

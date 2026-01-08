@@ -1,0 +1,10 @@
+{
+    "data_path": "data/",
+    "rates_ttl_seconds": 300,
+    "default_base_currency": "USD",
+    "log_path": "logs/",
+    "log_file": "actions.log",
+    "log_format": "%(asctime)s - %(levelname)s - %(message)s",
+    "default_usd_balance": 10000.0,
+    "api_timeout": 10
+}

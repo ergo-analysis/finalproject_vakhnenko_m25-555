@@ -1,7 +1,15 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
+from ..decorators import log_action
 from .models import User, Portfolio, Wallet
+from .currencies import get_currency
+from .exceptions import (
+    CurrencyNotFoundError, InsufficientFundsError, 
+    UserNotFoundError, InvalidPasswordError, ApiRequestError
+)
+from ..infra.settings import settings
+from ..infra.database import db
 from .utils import (
     load_users, save_users, load_portfolios, save_portfolios,
     generate_salt, hash_password, get_next_user_id, find_user_by_username,
@@ -11,6 +19,7 @@ from .utils import (
 
 class UserManager:
     @staticmethod
+    @log_action("REGISTER")
     def register(username: str, password: str) -> str:
         if find_user_by_username(username):
             raise ValueError(f"Имя пользователя '{username}' уже занято")
@@ -39,17 +48,18 @@ class UserManager:
         portfolios.append(portfolio.to_dict())
         save_portfolios(portfolios)
         
-        return f"Пользователь '{username}' зарегистрирован (id={user_id}). Войдите: login --username {username} --password ****"
+        return f"Пользователь '{username}' зарегистрирован (id={user_id})."
 
     @staticmethod
+    @log_action("LOGIN")
     def login(username: str, password: str) -> tuple[int, str]:
         user_data = find_user_by_username(username)
         if not user_data:
-            raise ValueError(f"Пользователь '{username}' не найден")
+            raise UserNotFoundError(username)
         
         user = User.from_dict(user_data)
         if not user.verify_password(password):
-            raise ValueError("Неверный пароль")
+            raise InvalidPasswordError()
         
         return user.user_id, f"Вы вошли как '{username}'"
 
@@ -57,6 +67,11 @@ class UserManager:
 class PortfolioManager:
     @staticmethod
     def get_portfolio_info(user_id: int, base_currency: str = "USD") -> Dict[str, Any]:
+        try:
+            get_currency(base_currency)
+        except CurrencyNotFoundError:
+            raise CurrencyNotFoundError(base_currency)
+        
         portfolio_data = get_user_portfolio(user_id)
         if not portfolio_data:
             portfolio = Portfolio(user_id)
@@ -72,20 +87,12 @@ class PortfolioManager:
         
         total = 0.0
         for wallet in portfolio.wallets.values():
-            value = 0.0
             if wallet.currency_code == base_currency:
                 value = wallet.balance
             else:
                 rate_key = f"{wallet.currency_code}_{base_currency}"
-                if rate_key in rates:
-                    rate = rates[rate_key]["rate"]
-                    value = wallet.balance * rate
-                else:
-                    # Пробуем обратный курс
-                    reverse_key = f"{base_currency}_{wallet.currency_code}"
-                    if reverse_key in rates:
-                        rate = 1 / rates[reverse_key]["rate"]
-                        value = wallet.balance * rate
+                rate = rates.get(rate_key, {}).get("rate", 0.0)
+                value = wallet.balance * rate
             
             result["wallets"].append({
                 "currency": wallet.currency_code,
@@ -94,13 +101,22 @@ class PortfolioManager:
             })
             total += value
         
+        if base_currency in portfolio.wallets:
+            total += portfolio.wallets[base_currency].balance
+        
         result["total_value"] = total
         return result
 
     @staticmethod
-    def buy_currency(user_id: int, currency_code: str, amount: float) -> str:
+    @log_action("BUY", verbose=True)
+    def buy_currency(user_id: int, currency_code: str, amount: float) -> Dict[str, Any]:
         if amount <= 0:
             raise ValueError("'amount' должен быть положительным числом")
+        
+        try:
+            get_currency(currency_code)
+        except CurrencyNotFoundError:
+            raise CurrencyNotFoundError(currency_code)
         
         portfolio_data = get_user_portfolio(user_id)
         if not portfolio_data:
@@ -111,24 +127,34 @@ class PortfolioManager:
         rates = PortfolioManager._load_rates()
         rate_key = f"{currency_code}_USD"
         if rate_key not in rates:
-            raise ValueError(f"Не удалось получить курс для {currency_code}→USD")
+            raise ApiRequestError(f"Не удалось получить курс для {currency_code}→USD")
         
         rate = rates[rate_key]["rate"]
         cost_usd = amount * rate
         
         usd_wallet = portfolio.get_wallet("USD")
         if not usd_wallet or usd_wallet.balance < cost_usd:
-            raise ValueError(f"Недостаточно средств на USD кошельке. Требуется: {cost_usd:.2f} USD")
+            raise InsufficientFundsError(
+                available=usd_wallet.balance if usd_wallet else 0.0,
+                required=cost_usd,
+                code="USD"
+            )
         
+        # Сохраняем старые балансы для лога
+        old_usd_balance = usd_wallet.balance
+        target_wallet = portfolio.get_wallet(currency_code)
+        old_target_balance = target_wallet.balance if target_wallet else 0.0
+        
+        # Выполняем операции
         usd_wallet.withdraw(cost_usd)
         
-        target_wallet = portfolio.get_wallet(currency_code)
         if not target_wallet:
             portfolio.add_currency(currency_code)
             target_wallet = portfolio.get_wallet(currency_code)
         
         target_wallet.deposit(amount)
         
+        # Сохраняем изменения
         portfolios = load_portfolios()
         for i, p in enumerate(portfolios):
             if p["user_id"] == user_id:
@@ -139,15 +165,26 @@ class PortfolioManager:
         
         save_portfolios(portfolios)
         
-        return (f"Покупка выполнена: {amount:.4f} {currency_code} по курсу {rate:.2f} USD/{currency_code}\n"
-                f"Изменения в портфеле:\n"
-                f"- {currency_code}: было {target_wallet.balance - amount:.4f} → стало {target_wallet.balance:.4f}\n"
-                f"Оценочная стоимость покупки: {cost_usd:.2f} USD")
+        # Возвращаем данные для лога и CLI
+        return {
+            "currency": currency_code,
+            "amount": amount,
+            "rate": rate,
+            "estimated_cost": cost_usd,
+            "old_balance": old_target_balance,
+            "new_balance": target_wallet.balance
+        }
 
     @staticmethod
-    def sell_currency(user_id: int, currency_code: str, amount: float) -> str:
+    @log_action("SELL", verbose=True)
+    def sell_currency(user_id: int, currency_code: str, amount: float) -> Dict[str, Any]:
         if amount <= 0:
             raise ValueError("'amount' должен быть положительным числом")
+        
+        try:
+            get_currency(currency_code)
+        except CurrencyNotFoundError:
+            raise CurrencyNotFoundError(currency_code)
         
         portfolio_data = get_user_portfolio(user_id)
         if not portfolio_data:
@@ -157,30 +194,38 @@ class PortfolioManager:
         
         target_wallet = portfolio.get_wallet(currency_code)
         if not target_wallet:
-            raise ValueError(f"У вас нет кошелька '{currency_code}'. "
-                           f"Добавьте валюту: она создаётся автоматически при первой покупке.")
+            raise ValueError(f"У вас нет кошелька '{currency_code}'.")
         
         if target_wallet.balance < amount:
-            raise ValueError(f"Недостаточно средств: доступно {target_wallet.balance:.4f} {currency_code}, "
-                           f"требуется {amount:.4f} {currency_code}")
+            raise InsufficientFundsError(
+                available=target_wallet.balance,
+                required=amount,
+                code=currency_code
+            )
         
         rates = PortfolioManager._load_rates()
         rate_key = f"{currency_code}_USD"
         if rate_key not in rates:
-            raise ValueError(f"Не удалось получить курс для {currency_code}→USD")
+            raise ApiRequestError(f"Не удалось получить курс для {currency_code}→USD")
         
         rate = rates[rate_key]["rate"]
         revenue_usd = amount * rate
         
+        # Сохраняем старые балансы для лога
+        old_target_balance = target_wallet.balance
+        usd_wallet = portfolio.get_wallet("USD")
+        old_usd_balance = usd_wallet.balance if usd_wallet else 0.0
+        
+        # Выполняем операции
         target_wallet.withdraw(amount)
         
-        usd_wallet = portfolio.get_wallet("USD")
         if not usd_wallet:
             portfolio.add_currency("USD")
             usd_wallet = portfolio.get_wallet("USD")
         
         usd_wallet.deposit(revenue_usd)
         
+        # Сохраняем изменения
         portfolios = load_portfolios()
         for i, p in enumerate(portfolios):
             if p["user_id"] == user_id:
@@ -190,19 +235,24 @@ class PortfolioManager:
             portfolios.append(portfolio.to_dict())
         
         save_portfolios(portfolios)
-        
-        return (f"Продажа выполнена: {amount:.4f} {currency_code} по курсу {rate:.2f} USD/{currency_code}\n"
-                f"Изменения в портфеле:\n"
-                f"- {currency_code}: было {target_wallet.balance + amount:.4f} → стало {target_wallet.balance:.4f}\n"
-                f"Оценочная выручка: {revenue_usd:.2f} USD")
 
+        # Возвращаем данные для лога и CLI
+        return {
+            "currency": currency_code,
+            "amount": amount,
+            "rate": rate,
+            "estimated_revenue": revenue_usd,
+            "old_balance": old_target_balance,
+            "new_balance": target_wallet.balance
+        }
+    
     @staticmethod
     def get_exchange_rate(from_currency: str, to_currency: str) -> Dict[str, Any]:
-        if not from_currency or not to_currency:
-            raise ValueError("Коды валют не могут быть пустыми")
-        
-        from_currency = from_currency.upper()
-        to_currency = to_currency.upper()
+        try:
+            get_currency(from_currency)
+            get_currency(to_currency)
+        except CurrencyNotFoundError as e:
+            raise CurrencyNotFoundError(e.code)
         
         rates = PortfolioManager._load_rates()
         rate_key = f"{from_currency}_{to_currency}"
@@ -214,7 +264,7 @@ class PortfolioManager:
                 updated_at = rates[reverse_key]["updated_at"]
                 source = rates[reverse_key]["source"]
             else:
-                raise ValueError(f"Курс {from_currency}→{to_currency} недоступен. Повторите попытку позже.")
+                raise ValueError(f"Курс {from_currency}→{to_currency} недоступен.")
         else:
             rate = rates[rate_key]["rate"]
             updated_at = rates[rate_key]["updated_at"]
