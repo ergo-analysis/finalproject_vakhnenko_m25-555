@@ -135,17 +135,17 @@ class Interface:
                 amount
             )
             
-            # Форматируем сообщение из словаря
-            message = (f"Покупка выполнена: {result['amount']:.4f} {result['currency']} "
-                    f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
-                    f"Оценочная стоимость покупки: {result['estimated_cost']:.2f} USD")
+            # Формируем сообщение для пользователя
+            return (f"Покупка выполнена: {result['amount']:.4f} {result['currency']} "
+                   f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
+                   f"Оценочная стоимость покупки: {result['estimated_cost']:.2f} USD")
             
-            return message
         except ValueError as e:
             return f"Ошибка: {e}"
         except Exception as e:
             return f"Ошибка: {str(e)}"
-
+    
+    
     def sell(self, args: dict) -> str:
         if not self.is_logged_in():
             return "Ошибка: Сначала выполните login"
@@ -164,12 +164,11 @@ class Interface:
                 amount
             )
             
-            # Форматируем сообщение из словаря
-            message = (f"Продажа выполнена: {result['amount']:.4f} {result['currency']} "
-                    f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
-                    f"Оценочная выручка: {result['estimated_revenue']:.2f} USD")
+            # Формируем сообщение для пользователя
+            return (f"Продажа выполнена: {result['amount']:.4f} {result['currency']} "
+                   f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
+                   f"Оценочная выручка: {result['estimated_revenue']:.2f} USD")
             
-            return message
         except ValueError as e:
             return f"Ошибка: {e}"
         except Exception as e:

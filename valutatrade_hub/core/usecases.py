@@ -1,7 +1,6 @@
 import json
 from datetime import datetime, timedelta
 from typing import Optional, Dict, Any
-from ..decorators import log_action
 from .models import User, Portfolio, Wallet
 from .currencies import get_currency
 from .exceptions import (
@@ -10,79 +9,100 @@ from .exceptions import (
 )
 from ..infra.settings import settings
 from ..infra.database import db
-from .utils import (
-    load_users, save_users, load_portfolios, save_portfolios,
-    generate_salt, hash_password, get_next_user_id, find_user_by_username,
-    get_user_portfolio
-)
+from ..decorators import log_action
 
 
 class UserManager:
     @staticmethod
     @log_action("REGISTER")
     def register(username: str, password: str) -> str:
-        if find_user_by_username(username):
+        existing_user = db.find_item("users.json", {"username": username})
+        if existing_user:
             raise ValueError(f"Имя пользователя '{username}' уже занято")
         
         if len(password) < 4:
             raise ValueError("Пароль должен быть не короче 4 символов")
         
-        user_id = get_next_user_id()
-        salt = generate_salt()
-        hashed_pw = hash_password(password, salt)
+        users = db.read_json("users.json", [])
+        user_id = max([u.get("user_id", 0) for u in users], default=0) + 1
         
-        user = User(
-            user_id=user_id,
-            username=username,
-            hashed_password=hashed_pw,
-            salt=salt,
-            registration_date=datetime.now()
-        )
+        import hashlib
+        import secrets
         
-        users = load_users()
-        users.append(user.to_dict())
-        save_users(users)
+        salt = secrets.token_hex(8)
+        hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
         
-        portfolio = Portfolio(user_id)
-        portfolios = load_portfolios()
-        portfolios.append(portfolio.to_dict())
-        save_portfolios(portfolios)
+        user_data = {
+            "user_id": user_id,
+            "username": username,
+            "hashed_password": hashed_pw,
+            "salt": salt,
+            "registration_date": datetime.now().isoformat()
+        }
+        
+        users.append(user_data)
+        db.write_json("users.json", users)
+        
+        portfolio_data = {
+            "user_id": user_id,
+            "wallets": {
+                "USD": {
+                    "currency_code": "USD",
+                    "balance": settings.get("default_usd_balance", 10000.0)
+                }
+            }
+        }
+        
+        portfolios = db.read_json("portfolios.json", [])
+        portfolios.append(portfolio_data)
+        db.write_json("portfolios.json", portfolios)
         
         return f"Пользователь '{username}' зарегистрирован (id={user_id})."
 
     @staticmethod
     @log_action("LOGIN")
     def login(username: str, password: str) -> tuple[int, str]:
-        user_data = find_user_by_username(username)
+        user_data = db.find_item("users.json", {"username": username})
         if not user_data:
             raise UserNotFoundError(username)
         
-        user = User.from_dict(user_data)
-        if not user.verify_password(password):
+        import hashlib
+        salt = user_data.get("salt", "")
+        hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
+        
+        if hashed_pw != user_data.get("hashed_password"):
             raise InvalidPasswordError()
         
-        return user.user_id, f"Вы вошли как '{username}'"
+        return user_data["user_id"], f"Вы вошли как '{username}'"
 
 
 class PortfolioManager:
     @staticmethod
-    def get_portfolio_info(user_id: int, base_currency: str = "USD") -> Dict[str, Any]:
+    def get_portfolio_info(user_id: int, base_currency: str = None) -> Dict[str, Any]:
+        if base_currency is None:
+            base_currency = settings.get("default_base_currency", "USD")
+        
         try:
             get_currency(base_currency)
         except CurrencyNotFoundError:
             raise CurrencyNotFoundError(base_currency)
         
-        portfolio_data = get_user_portfolio(user_id)
+        portfolio_data = db.find_item("portfolios.json", {"user_id": user_id})
         if not portfolio_data:
             portfolio = Portfolio(user_id)
         else:
             portfolio = Portfolio.from_dict(portfolio_data)
         
         rates = PortfolioManager._load_rates()
+        
+        if PortfolioManager._are_rates_stale(rates):
+            print("Внимание: курсы валют устарели. Рекомендуется обновить через update-rates")
+        
         result = {
             "wallets": [],
             "total_value": 0.0,
-            "base_currency": base_currency
+            "base_currency": base_currency,
+            "rates_fresh": not PortfolioManager._are_rates_stale(rates)
         }
         
         total = 0.0
@@ -118,7 +138,7 @@ class PortfolioManager:
         except CurrencyNotFoundError:
             raise CurrencyNotFoundError(currency_code)
         
-        portfolio_data = get_user_portfolio(user_id)
+        portfolio_data = db.find_item("portfolios.json", {"user_id": user_id})
         if not portfolio_data:
             portfolio = Portfolio(user_id)
         else:
@@ -126,8 +146,9 @@ class PortfolioManager:
         
         rates = PortfolioManager._load_rates()
         rate_key = f"{currency_code}_USD"
+        
         if rate_key not in rates:
-            raise ApiRequestError(f"Не удалось получить курс для {currency_code}→USD")
+            raise ApiRequestError(f"Курс {currency_code}→USD недоступен")
         
         rate = rates[rate_key]["rate"]
         cost_usd = amount * rate
@@ -140,13 +161,12 @@ class PortfolioManager:
                 code="USD"
             )
         
-        # Сохраняем старые балансы для лога
+        # Сохраняем старый баланс
         old_usd_balance = usd_wallet.balance
+        usd_wallet.withdraw(cost_usd)
+        
         target_wallet = portfolio.get_wallet(currency_code)
         old_target_balance = target_wallet.balance if target_wallet else 0.0
-        
-        # Выполняем операции
-        usd_wallet.withdraw(cost_usd)
         
         if not target_wallet:
             portfolio.add_currency(currency_code)
@@ -154,19 +174,10 @@ class PortfolioManager:
         
         target_wallet.deposit(amount)
         
-        # Сохраняем изменения
-        portfolios = load_portfolios()
-        for i, p in enumerate(portfolios):
-            if p["user_id"] == user_id:
-                portfolios[i] = portfolio.to_dict()
-                break
-        else:
-            portfolios.append(portfolio.to_dict())
+        db.update_item("portfolios.json", "user_id", portfolio.to_dict())
         
-        save_portfolios(portfolios)
-        
-        # Возвращаем данные для лога и CLI
         return {
+            "user_id": user_id,
             "currency": currency_code,
             "amount": amount,
             "rate": rate,
@@ -186,7 +197,7 @@ class PortfolioManager:
         except CurrencyNotFoundError:
             raise CurrencyNotFoundError(currency_code)
         
-        portfolio_data = get_user_portfolio(user_id)
+        portfolio_data = db.find_item("portfolios.json", {"user_id": user_id})
         if not portfolio_data:
             portfolio = Portfolio(user_id)
         else:
@@ -196,28 +207,28 @@ class PortfolioManager:
         if not target_wallet:
             raise ValueError(f"У вас нет кошелька '{currency_code}'.")
         
+        old_target_balance = target_wallet.balance
+        
         if target_wallet.balance < amount:
             raise InsufficientFundsError(
-                available=target_wallet.balance,
+                available=old_target_balance,
                 required=amount,
                 code=currency_code
             )
         
         rates = PortfolioManager._load_rates()
         rate_key = f"{currency_code}_USD"
+        
         if rate_key not in rates:
-            raise ApiRequestError(f"Не удалось получить курс для {currency_code}→USD")
+            raise ApiRequestError(f"Курс {currency_code}→USD недоступен")
         
         rate = rates[rate_key]["rate"]
         revenue_usd = amount * rate
         
-        # Сохраняем старые балансы для лога
-        old_target_balance = target_wallet.balance
+        target_wallet.withdraw(amount)
+        
         usd_wallet = portfolio.get_wallet("USD")
         old_usd_balance = usd_wallet.balance if usd_wallet else 0.0
-        
-        # Выполняем операции
-        target_wallet.withdraw(amount)
         
         if not usd_wallet:
             portfolio.add_currency("USD")
@@ -225,19 +236,10 @@ class PortfolioManager:
         
         usd_wallet.deposit(revenue_usd)
         
-        # Сохраняем изменения
-        portfolios = load_portfolios()
-        for i, p in enumerate(portfolios):
-            if p["user_id"] == user_id:
-                portfolios[i] = portfolio.to_dict()
-                break
-        else:
-            portfolios.append(portfolio.to_dict())
+        db.update_item("portfolios.json", "user_id", portfolio.to_dict())
         
-        save_portfolios(portfolios)
-
-        # Возвращаем данные для лога и CLI
         return {
+            "user_id": user_id,
             "currency": currency_code,
             "amount": amount,
             "rate": rate,
@@ -245,7 +247,7 @@ class PortfolioManager:
             "old_balance": old_target_balance,
             "new_balance": target_wallet.balance
         }
-    
+
     @staticmethod
     def get_exchange_rate(from_currency: str, to_currency: str) -> Dict[str, Any]:
         try:
@@ -255,6 +257,10 @@ class PortfolioManager:
             raise CurrencyNotFoundError(e.code)
         
         rates = PortfolioManager._load_rates()
+        
+        if PortfolioManager._are_rates_stale(rates):
+            print("Внимание: курсы валют устарели")
+        
         rate_key = f"{from_currency}_{to_currency}"
         
         if rate_key not in rates:
@@ -264,7 +270,7 @@ class PortfolioManager:
                 updated_at = rates[reverse_key]["updated_at"]
                 source = rates[reverse_key]["source"]
             else:
-                raise ValueError(f"Курс {from_currency}→{to_currency} недоступен.")
+                raise ApiRequestError(f"Курс {from_currency}→{to_currency} недоступен")
         else:
             rate = rates[rate_key]["rate"]
             updated_at = rates[rate_key]["updated_at"]
@@ -276,14 +282,34 @@ class PortfolioManager:
             "rate": rate,
             "updated_at": updated_at,
             "source": source,
-            "inverse_rate": 1 / rate if rate != 0 else 0
+            "inverse_rate": 1 / rate if rate != 0 else 0,
+            "is_fresh": not PortfolioManager._are_rates_stale(rates)
         }
 
     @staticmethod
     def _load_rates() -> Dict[str, Any]:
         try:
-            with open("data/rates.json", "r") as f:
-                data = json.load(f)
-                return data.get("pairs", {})
-        except (FileNotFoundError, json.JSONDecodeError):
+            rates_data = db.read_json("rates.json", {})
+            return rates_data.get("pairs", {})
+        except Exception:
             return {}
+
+    @staticmethod
+    def _are_rates_stale(rates: Dict[str, Any]) -> bool:
+        if not rates:
+            return True
+        
+        ttl_seconds = settings.get("rates_ttl_seconds", 300)
+        last_refresh = rates.get("last_refresh")
+        
+        if not last_refresh:
+            return True
+        
+        try:
+            from datetime import datetime
+            last_update = datetime.fromisoformat(last_refresh.replace('Z', '+00:00'))
+            now = datetime.now()
+            age = (now - last_update).total_seconds()
+            return age > ttl_seconds
+        except (ValueError, TypeError):
+            return True

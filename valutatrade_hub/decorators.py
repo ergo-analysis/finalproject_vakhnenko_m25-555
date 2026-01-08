@@ -1,88 +1,85 @@
 import functools
 import logging
 from datetime import datetime
-from typing import Any, Callable, Dict
+from typing import Any, Callable
 
 
-def log_action(action_name: str = None, verbose: bool = False):
+def log_action(action: str, verbose: bool = False):
     """
-    Декоратор для записи логов операций
+    Декоратор для логирования действий.
     """
+    
     def decorator(func: Callable) -> Callable:
+        
         @functools.wraps(func)
         def wrapper(*args, **kwargs) -> Any:
-            logger = logging.getLogger('actions')
-            
-            operation = action_name or func.__name__.upper()
+            logger = logging.getLogger("valutatrade")
             
             log_data = {
-                'action': operation,
-                'timestamp': datetime.now().isoformat(),
-                'result': 'OK'
+                "action": action,
+                "result": "OK"
             }
             
             try:
-                # Прямое извлечение аргументов для наших методов
-                # 1. Для buy_currency/sell_currency: (user_id, currency_code, amount)
-                # 2. Для register/login: (username, password)
+                # Извлекаем данные для логирования
+                if action in ["REGISTER", "LOGIN"]:
+                    # Для регистрации и входа: первый аргумент - username
+                    if args and len(args) > 0:
+                        log_data["user"] = f"'{args[0]}'"
                 
-                if operation in ['BUY', 'SELL']:
-                    # Для методов покупки/продажи
-                    if len(args) >= 1:
-                        # user_id может быть args[0] для статических методов
-                        # или args[1] для методов класса (где args[0] = self)
-                        if isinstance(args[0], int):
-                            log_data['user_id'] = args[0]
-                        elif len(args) >= 2 and isinstance(args[1], int):
-                            log_data['user_id'] = args[1]
+                elif action in ["BUY", "SELL"]:
+                    # Для покупки и продажи
+                    if len(args) > 0:
+                        log_data["user"] = str(args[0])
+                    if len(args) > 1:
+                        log_data["currency"] = f"'{args[1]}'"
+                    if len(args) > 2:
+                        log_data["amount"] = f"{args[2]:.4f}"
+                    # Добавляем base='USD' как в ТЗ
+                    log_data["base"] = "'USD'"
                 
-                # Проверяем именованные аргументы (приоритет выше)
-                if 'user_id' in kwargs:
-                    log_data['user_id'] = kwargs['user_id']
-                if 'username' in kwargs:
-                    log_data['username'] = kwargs['username']
-                if 'currency_code' in kwargs:
-                    log_data['currency_code'] = kwargs['currency_code']
-                elif 'currency' in kwargs:
-                    log_data['currency_code'] = kwargs['currency']
-                if 'amount' in kwargs:
-                    log_data['amount'] = kwargs['amount']
-                
-                # Для позиционных аргументов функций
-                if operation == 'REGISTER' or operation == 'LOGIN':
-                    if len(args) >= 1 and isinstance(args[0], str):
-                        log_data['username'] = args[0]
-                
-                # Выполняем основную функцию
+                # Выполняем декорируемую функцию
                 result = func(*args, **kwargs)
                 
-                # Добавляем детали при verbose=True
+                # Добавляем дополнительные данные из результата
                 if verbose and isinstance(result, dict):
-                    if 'rate' in result and result['rate'] is not None:
-                        log_data['rate'] = result['rate']
-                    if 'estimated_cost' in result and result['estimated_cost'] is not None:
-                        log_data['cost'] = result['estimated_cost']
-                    if 'estimated_revenue' in result and result['estimated_revenue'] is not None:
-                        log_data['revenue'] = result['estimated_revenue']
-                    if 'currency' in result:
-                        log_data['currency_code'] = result['currency']
-                    if 'amount' in result:
-                        log_data['amount'] = result['amount']
+                    if "rate" in result and result["rate"]:
+                        log_data["rate"] = f"{result['rate']:.2f}"
                 
-                # Форматируем и записываем лог
-                log_message = _format_log_entry(log_data)
-                logger.info(log_message)
+                # Формируем строку лога в формате как в ТЗ
+                log_parts = [f"{log_data['action']}"]
+                
+                # Порядок полей как в примере ТЗ
+                if "user" in log_data:
+                    log_parts.append(f"user={log_data['user']}")
+                if "currency" in log_data:
+                    log_parts.append(f"currency={log_data['currency']}")
+                if "amount" in log_data:
+                    log_parts.append(f"amount={log_data['amount']}")
+                if "rate" in log_data:
+                    log_parts.append(f"rate={log_data['rate']}")
+                if "base" in log_data:
+                    log_parts.append(f"base={log_data['base']}")
+                
+                log_parts.append(f"result={log_data['result']}")
+                
+                logger.info(" ".join(log_parts))
                 
                 return result
                 
             except Exception as e:
                 # Логируем ошибку
-                log_data['result'] = 'ERROR'
-                log_data['error_type'] = type(e).__name__
-                log_data['error_message'] = str(e)
+                log_data["result"] = "ERROR"
                 
-                log_message = _format_log_entry(log_data)
-                logger.error(log_message)
+                # Формируем строку лога с ошибкой
+                log_parts = [
+                    f"{log_data['action']}",
+                    f"result={log_data['result']}",
+                    f"error_type={type(e).__name__}",
+                    f"error_message='{str(e)}'"
+                ]
+                
+                logger.error(" ".join(log_parts))
                 
                 # Пробрасываем исключение дальше
                 raise
@@ -90,38 +87,3 @@ def log_action(action_name: str = None, verbose: bool = False):
         return wrapper
     
     return decorator
-
-
-def _format_log_entry(log_data: Dict[str, Any]) -> str:
-    """Форматирование данных лога в строку"""
-    parts = [log_data['action']]
-    
-    if 'user_id' in log_data:
-        parts.append(f"user_id={log_data['user_id']}")
-    elif 'username' in log_data:
-        parts.append(f"username='{log_data['username']}'")
-    
-    if 'currency_code' in log_data:
-        parts.append(f"currency='{log_data['currency_code']}'")
-    
-    if 'amount' in log_data:
-        parts.append(f"amount={log_data['amount']:.4f}")
-    
-    if 'rate' in log_data and log_data['rate'] is not None:
-        parts.append(f"rate={log_data['rate']:.2f}")
-    
-    if 'cost' in log_data and log_data['cost'] is not None:
-        parts.append(f"cost={log_data['cost']:.2f}")
-    
-    if 'revenue' in log_data and log_data['revenue'] is not None:
-        parts.append(f"revenue={log_data['revenue']:.2f}")
-    
-    parts.append(f"result={log_data['result']}")
-    
-    if log_data['result'] == 'ERROR':
-        error_msg = log_data.get('error_message', '')
-        if len(error_msg) > 50:
-            error_msg = error_msg[:47] + "..."
-        parts.append(f"error={log_data['error_type']}:{error_msg}")
-    
-    return " ".join(parts)
