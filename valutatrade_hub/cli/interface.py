@@ -2,18 +2,24 @@ import shlex
 import sys
 from typing import Optional
 from ..core.usecases import UserManager, PortfolioManager
-from ..core.currencies import get_all_currencies, FiatCurrency, CryptoCurrency
+from ..core.currencies import (get_all_currencies, 
+                               FiatCurrency,
+                                CryptoCurrency)
+
 from ..infra.settings import settings as app_settings
+from ..core.exceptions import (CurrencyNotFoundError, 
+                               InsufficientFundsError,
+                                ApiRequestError)
 
 
 class Interface:
-    """CLI интерфейс для торгового симулятора"""
+    """интерфейс для торгового симулятора """
     
     def __init__(self):
         self.current_user_id: Optional[int] = None
         self.current_username: Optional[str] = None
         self.running = True
-        self.settings = app_settings  # Импорт settings в конструкторе
+        self.settings = app_settings 
     
     def login_user(self, user_id: int, username: str):
         self.current_user_id = user_id
@@ -52,6 +58,7 @@ class Interface:
         print("  buy --currency <code> --amount <number>        - купить")
         print("  sell --currency <code> --amount <number>       - продать")
         print("  get-rate --from <currency> --to <currency>     - курс")
+        print("  update-rates                                   - обновить курсы (заглушка)")
         print("  list-currencies                                - список валют")
         print("  show-settings                                  - настройки")
         print("  reload-settings                                - перезагрузка настроек")
@@ -116,7 +123,12 @@ class Interface:
         except Exception as e:
             return f"Ошибка: {e}"
     
+
+    def update_rates(self, args: dict) -> str:
+        """Заглушка для обновления курсов - будет реализовано в парсере"""
+        return 
     
+
     def buy(self, args: dict) -> str:
         if not self.is_logged_in():
             return "Ошибка: Сначала выполните login"
@@ -135,16 +147,19 @@ class Interface:
                 amount
             )
             
-            # Формируем сообщение для пользователя
             return (f"Покупка выполнена: {result['amount']:.4f} {result['currency']} "
                    f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
                    f"Оценочная стоимость покупки: {result['estimated_cost']:.2f} USD")
             
+        except CurrencyNotFoundError as e:
+            # возвращаем сообщение пользователю, ошибку должен ловить декоратор
+            return f"Ошибка: Неизвестная валюта '{e.code}'. Используйте 'list-currencies' для списка."
+        except InsufficientFundsError as e:
+            return f"Ошибка: {e}"
+        except ApiRequestError as e:
+            return f"Ошибка: {e.reason}. Выполните 'update-rates' для обновления курсов."
         except ValueError as e:
             return f"Ошибка: {e}"
-        except Exception as e:
-            return f"Ошибка: {str(e)}"
-    
     
     def sell(self, args: dict) -> str:
         if not self.is_logged_in():
@@ -164,17 +179,19 @@ class Interface:
                 amount
             )
             
-            # Формируем сообщение для пользователя
             return (f"Продажа выполнена: {result['amount']:.4f} {result['currency']} "
                    f"по курсу {result['rate']:.2f} USD/{result['currency']}\n"
                    f"Оценочная выручка: {result['estimated_revenue']:.2f} USD")
             
+        except CurrencyNotFoundError as e:
+            return f"Ошибка: Неизвестная валюта '{e.code}'. Используйте 'list-currencies' для списка."
+        except InsufficientFundsError as e:
+            return f"Ошибка: {e}"
         except ValueError as e:
             return f"Ошибка: {e}"
-        except Exception as e:
-            return f"Ошибка: {str(e)}"
+        except ApiRequestError as e:
+            return f"Ошибка: {e.reason}. Выполните 'update-rates' для обновления курсов."
     
-
     def get_rate(self, args: dict) -> str:
         if 'from' not in args or 'to' not in args:
             return "Ошибка: требуется --from и --to"
@@ -182,13 +199,19 @@ class Interface:
         try:
             rate_info = PortfolioManager.get_exchange_rate(args['from'], args['to'])
             
-            return (f"\nКурс {rate_info['from_currency']}→{rate_info['to_currency']}: {rate_info['rate']:.8f}\n"
-                    f"Время обновления: {rate_info['updated_at']}\n"
-                    f"Источник: {rate_info['source']}\n"
-                    f"Обратный курс {rate_info['to_currency']}→{rate_info['from_currency']}: {rate_info['inverse_rate']:.8f}")
+            freshness_note = "" if rate_info.get('is_fresh', True) else " (данные устарели)"
+            
+            return (f"\nКурс {rate_info['from_currency']}→{rate_info['to_currency']}: "
+                   f"{rate_info['rate']:.8f}{freshness_note}\n"
+                   f"Время обновления: {rate_info['updated_at']}\n"
+                   f"Источник: {rate_info['source']}\n"
+                   f"Обратный курс {rate_info['to_currency']}→{rate_info['from_currency']}: "
+                   f"{rate_info['inverse_rate']:.8f}")
         
-        except ValueError as e:
-            return f"Ошибка: {e}"
+        except CurrencyNotFoundError as e:
+            return f"Ошибка: Неизвестная валюта '{e.code}'. Используйте 'list-currencies' для списка валют."
+        except ApiRequestError as e:
+            return f"Ошибка: {e.reason}. Повторите попытку позже или выполните 'update-rates'."
     
     def list_currencies(self, args: dict) -> str:
         currencies = get_all_currencies()
@@ -262,6 +285,7 @@ class Interface:
                 return f"Неизвестная команда: {command}. Введите 'help' для списка команд."
         
         except Exception as e:
+            # Обработка непредвиденных ошибок
             return f"Ошибка выполнения команды: {str(e)}"
     
     def get_prompt(self) -> str:

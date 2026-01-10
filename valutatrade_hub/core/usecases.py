@@ -258,8 +258,7 @@ class PortfolioManager:
         
         rates = PortfolioManager._load_rates()
         
-        if PortfolioManager._are_rates_stale(rates):
-            print("Внимание: курсы валют устарели")
+        is_stale = PortfolioManager._are_rates_stale(rates)
         
         rate_key = f"{from_currency}_{to_currency}"
         
@@ -283,7 +282,7 @@ class PortfolioManager:
             "updated_at": updated_at,
             "source": source,
             "inverse_rate": 1 / rate if rate != 0 else 0,
-            "is_fresh": not PortfolioManager._are_rates_stale(rates)
+            "is_fresh": not is_stale
         }
 
     @staticmethod
