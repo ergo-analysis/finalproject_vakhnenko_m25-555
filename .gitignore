@@ -24,7 +24,6 @@ MANIFEST
 
 # Poetry
 .poetry/
-# pyproject.toml - НЕ игнорируем, он нужен!
 
 # Virtual environments
 .env
@@ -55,15 +54,11 @@ coverage.xml
 /cover/
 
 # Logs - игнорируем все файлы логов, но не саму директорию
-logs/*
-!logs/.gitkeep
+logs/
 
 # Data files - игнорируем все файлы данных, но не саму директорию
-# оставлю exchange_rates.json для истории изменения валют
+data/
 
-data/*
-!data/.gitkeep
-!data/exchange_rates.json 
 # Config files (игнорируем пользовательские конфиги)
 config.json
 .env
