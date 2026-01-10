@@ -161,7 +161,8 @@ class PortfolioManager:
                 code="USD"
             )
         
-        # Сохраняем старый баланс
+        # Сохраняем старый баланс, 
+        # это легаси, мб пригодится потом, пока не буду убирать
         old_usd_balance = usd_wallet.balance
         usd_wallet.withdraw(cost_usd)
         

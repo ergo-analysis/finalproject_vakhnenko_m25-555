@@ -35,21 +35,19 @@ def log_action(action: str, verbose: bool = False):
                         log_data["currency"] = f"'{args[1]}'"
                     if len(args) > 2:
                         log_data["amount"] = f"{args[2]:.4f}"
-                    # Добавляем base='USD' как в ТЗ
+                    # Добавляем base='USD' как в тз
                     log_data["base"] = "'USD'"
                 
-                # Выполняем декорируемую функцию
+
                 result = func(*args, **kwargs)
                 
-                # Добавляем дополнительные данные из результата
                 if verbose and isinstance(result, dict):
                     if "rate" in result and result["rate"]:
                         log_data["rate"] = f"{result['rate']:.2f}"
                 
-                # Формируем строку лога в формате как в ТЗ
+                #чувствиетльный момент, надо сформировть все по тз
                 log_parts = [f"{log_data['action']}"]
                 
-                # Порядок полей как в примере ТЗ
                 if "user" in log_data:
                     log_parts.append(f"user={log_data['user']}")
                 if "currency" in log_data:
@@ -68,10 +66,10 @@ def log_action(action: str, verbose: bool = False):
                 return result
                 
             except Exception as e:
-                # Логируем ошибку
+
                 log_data["result"] = "ERROR"
                 
-                # Формируем строку лога с ошибкой
+                # строка лога где ошибка
                 log_parts = [
                     f"{log_data['action']}",
                     f"result={log_data['result']}",

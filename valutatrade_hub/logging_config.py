@@ -5,11 +5,11 @@ from pathlib import Path
 def configure_logging():
     """Настройка логирования для всего приложения"""
     
-    # Создаем директорию для логов
+    # Создаем директорию где буудт логи
     log_dir = Path("logs")
     log_dir.mkdir(exist_ok=True)
     
-    # Формат логов (как в ТЗ: LEVEL TIMESTAMP MESSAGE)
+    # Формал тога из тз
     log_format = "%(levelname)s %(asctime)s %(message)s"
     date_format = "%Y-%m-%dT%H:%M:%S"
     
@@ -17,10 +17,10 @@ def configure_logging():
     logger = logging.getLogger("valutatrade")
     logger.setLevel(logging.INFO)
     
-    # Удаляем старые обработчики, чтобы избежать дублирования
+    # Удаляем старые обработчики
     logger.handlers.clear()
     
-    # Файловый обработчик с ротацией
+    #обработчик с ротацией
     file_handler = logging.handlers.RotatingFileHandler(
         filename=log_dir / "actions.log",
         maxBytes=10*1024*1024,  # 10 MB
@@ -31,7 +31,7 @@ def configure_logging():
     file_formatter = logging.Formatter(log_format, datefmt=date_format)
     file_handler.setFormatter(file_formatter)
     
-    # Консольный обработчик с таким же форматом, но без timestamp для читаемости
+    # тот же обработчик, только другой, без timestamp 
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.INFO)
     console_formatter = logging.Formatter("%(levelname)s: %(message)s")
@@ -41,7 +41,7 @@ def configure_logging():
     logger.addHandler(file_handler)
     logger.addHandler(console_handler)
     
-    # Логируем старт приложения ОДНОЙ строкой
+    # Логгируем старт приложения
     logger.info("Приложение ValutaTrade Hub запущено")
     
     return logger

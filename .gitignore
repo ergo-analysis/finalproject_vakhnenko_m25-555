@@ -59,10 +59,11 @@ logs/*
 !logs/.gitkeep
 
 # Data files - игнорируем все файлы данных, но не саму директорию
+# оставлю exchange_rates.json для истории изменения валют
+
 data/*
 !data/.gitkeep
-!data/rates.json  # rates.json должен быть в репозитории!
-
+!data/exchange_rates.json 
 # Config files (игнорируем пользовательские конфиги)
 config.json
 .env
