@@ -1,3 +1,5 @@
+import hashlib
+import secrets
 from datetime import datetime
 from typing import Any, Dict
 
@@ -22,9 +24,6 @@ class UserManager:
         
         users = db.read_json("users.json", [])
         user_id = max([u.get("user_id", 0) for u in users], default=0) + 1
-        
-        import hashlib
-        import secrets
         
         salt = secrets.token_hex(8)
         hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
@@ -62,8 +61,7 @@ class UserManager:
         user_data = db.find_item("users.json", {"username": username})
         if not user_data:
             raise UserNotFoundError(username)
-        
-        import hashlib
+
         salt = user_data.get("salt", "")
         hashed_pw = hashlib.sha256((password + salt).encode()).hexdigest()
         
@@ -92,7 +90,6 @@ class PortfolioManager:
         
         # Загружаем данные
         rates_data = PortfolioManager._load_rates()
-        #rates = rates_data.get("pairs", {})
         
         if PortfolioManager._are_rates_stale(rates_data):
             print("Внимание: курсы валют устарели. Рекомендуется обновить через update-rates")
@@ -148,9 +145,8 @@ class PortfolioManager:
         else:
             portfolio = Portfolio.from_dict(portfolio_data)
         
-        # Правильно загружаем курсы - получаем полные данные, затем извлекаем pairs
         rates_data = PortfolioManager._load_rates()
-        rates = rates_data.get("pairs", {})  # Исправлено: получаем пары из данных
+        rates = rates_data.get("pairs", {})
         rate_key = f"{currency_code}_USD"
         
         if rate_key not in rates:
@@ -221,9 +217,9 @@ class PortfolioManager:
                 code=currency_code
             )
         
-        # Правильно загружаем курсы - получаем полные данные, затем извлекаем pairs
+        # загружаем полные данные, извлекаем пары валют
         rates_data = PortfolioManager._load_rates()
-        rates = rates_data.get("pairs", {})  # Исправлено: получаем пары из данных
+        rates = rates_data.get("pairs", {})
         rate_key = f"{currency_code}_USD"
         
         if rate_key not in rates:
@@ -262,7 +258,6 @@ class PortfolioManager:
         except CurrencyNotFoundError as e:
             raise CurrencyNotFoundError(e.code)
         
-        # Загружаем полные данные
         rates_data = PortfolioManager._load_rates()
         rates = rates_data.get("pairs", {})
         last_refresh = rates_data.get("last_refresh")
@@ -298,7 +293,7 @@ class PortfolioManager:
                 "is_fresh": not is_stale
             }
         
-        # Расчет через USD (косвенный курс)
+        # косвенный рассчет
         if from_currency != "USD" and to_currency != "USD":
             from_to_usd_key = f"{from_currency}_USD"
             to_to_usd_key = f"{to_currency}_USD"
@@ -347,8 +342,6 @@ class PortfolioManager:
             return True
         
         try:
-            from datetime import datetime
-            # Обрабатываем разные форматы времени
             clean_time = last_refresh.replace('Z', '+00:00') if last_refresh.endswith('Z') else last_refresh
             last_update = datetime.fromisoformat(clean_time)
             
