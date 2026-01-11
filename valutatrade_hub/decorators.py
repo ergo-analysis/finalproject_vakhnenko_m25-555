@@ -1,7 +1,22 @@
 import functools
+import json
 import logging
-from datetime import datetime
+from pathlib import Path
 from typing import Any, Callable
+
+
+def load_users():
+    """Загружает пользователей из файла users.json"""
+    users_file = Path("data/users.json")
+    if users_file.exists():
+        with open(users_file, 'r', encoding='utf-8') as f:
+            users_data = json.load(f)
+        # Создаем маппинг id:username
+        user_map = {}
+        for user in users_data:
+            user_map[user["user_id"]] = user["username"]
+        return user_map
+    return {}
 
 
 def log_action(action: str, verbose: bool = False):
@@ -20,22 +35,31 @@ def log_action(action: str, verbose: bool = False):
                 "result": "OK"
             }
             
+            # Загружаем маппинг id:username
+            user_map = load_users()
+            
             try:
                 # Извлекаем данные для логирования
                 if action in ["REGISTER", "LOGIN"]:
-                    # Для регистрации и входа: первый аргумент - username
+                    # Для регистрации и входа: первый аргумент --username
                     if args and len(args) > 0:
                         log_data["user"] = f"'{args[0]}'"
                 
                 elif action in ["BUY", "SELL"]:
-                    # Для покупки и продажи
-                    if len(args) > 0:
-                        log_data["user"] = str(args[0])
+                    user_id = args[0] if len(args) > 0 else None
+                    
+                    # достаем имя юзера по ид
+                    # Если не найден, используем ид
+                    if user_id is not None and isinstance(user_id, int):
+                        username = user_map.get(user_id, str(user_id))  
+                        log_data["user"] = f"'{username}'"
+                    else:
+                        log_data["user"] = f"'{user_id}'"
+                        
                     if len(args) > 1:
                         log_data["currency"] = f"'{args[1]}'"
                     if len(args) > 2:
                         log_data["amount"] = f"{args[2]:.4f}"
-                    # Добавляем base='USD' как в тз
                     log_data["base"] = "'USD'"
                 
 
@@ -45,7 +69,7 @@ def log_action(action: str, verbose: bool = False):
                     if "rate" in result and result["rate"]:
                         log_data["rate"] = f"{result['rate']:.2f}"
                 
-                #чувствиетльный момент, надо сформировть все по тз
+                #чувствоительный момент, надо сформировать все по тз
                 log_parts = [f"{log_data['action']}"]
                 
                 if "user" in log_data:

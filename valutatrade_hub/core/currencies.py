@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
+
 from .exceptions import CurrencyNotFoundError
+
 
 class Currency(ABC):
     """Абстрактный базовый класс для валют"""

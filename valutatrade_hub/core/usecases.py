@@ -1,15 +1,12 @@
-import json
-from datetime import datetime, timedelta
-from typing import Optional, Dict, Any
-from .models import User, Portfolio, Wallet
-from .currencies import get_currency
-from .exceptions import (
-    CurrencyNotFoundError, InsufficientFundsError, 
-    UserNotFoundError, InvalidPasswordError, ApiRequestError
-)
-from ..infra.settings import settings
-from ..infra.database import db
+from datetime import datetime
+from typing import Any, Dict
+
 from ..decorators import log_action
+from ..infra.database import db
+from ..infra.settings import settings
+from .currencies import get_currency
+from .exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError, InvalidPasswordError, UserNotFoundError
+from .models import Portfolio
 
 
 class UserManager:
@@ -76,7 +73,7 @@ class UserManager:
         return user_data["user_id"], f"Вы вошли как '{username}'"
 
 
-class PortfolioManager:
+class PortfolioManager: 
     @staticmethod
     def get_portfolio_info(user_id: int, base_currency: str = None) -> Dict[str, Any]:
         if base_currency is None:
@@ -93,16 +90,18 @@ class PortfolioManager:
         else:
             portfolio = Portfolio.from_dict(portfolio_data)
         
-        rates = PortfolioManager._load_rates()
+        # Загружаем данные
+        rates_data = PortfolioManager._load_rates()
+        #rates = rates_data.get("pairs", {})
         
-        if PortfolioManager._are_rates_stale(rates):
+        if PortfolioManager._are_rates_stale(rates_data):
             print("Внимание: курсы валют устарели. Рекомендуется обновить через update-rates")
         
         result = {
             "wallets": [],
             "total_value": 0.0,
             "base_currency": base_currency,
-            "rates_fresh": not PortfolioManager._are_rates_stale(rates)
+            "rates_fresh": not PortfolioManager._are_rates_stale(rates_data)
         }
         
         total = 0.0
@@ -110,9 +109,16 @@ class PortfolioManager:
             if wallet.currency_code == base_currency:
                 value = wallet.balance
             else:
-                rate_key = f"{wallet.currency_code}_{base_currency}"
-                rate = rates.get(rate_key, {}).get("rate", 0.0)
-                value = wallet.balance * rate
+
+                try:
+                    rate_info = PortfolioManager.get_exchange_rate(wallet.currency_code, base_currency)
+                    rate = rate_info["rate"]
+                    value = wallet.balance * rate
+                except ApiRequestError:
+                    # Если курс не найден, ставим 0.0 и пишем предупреждение
+                    print(f"Предупреждение: Не удалось получить курс {wallet.currency_code}→{base_currency}")
+                    rate = 0.0
+                    value = 0.0
             
             result["wallets"].append({
                 "currency": wallet.currency_code,
@@ -121,11 +127,9 @@ class PortfolioManager:
             })
             total += value
         
-        if base_currency in portfolio.wallets:
-            total += portfolio.wallets[base_currency].balance
-        
         result["total_value"] = total
         return result
+
 
     @staticmethod
     @log_action("BUY", verbose=True)
@@ -144,7 +148,9 @@ class PortfolioManager:
         else:
             portfolio = Portfolio.from_dict(portfolio_data)
         
-        rates = PortfolioManager._load_rates()
+        # Правильно загружаем курсы - получаем полные данные, затем извлекаем pairs
+        rates_data = PortfolioManager._load_rates()
+        rates = rates_data.get("pairs", {})  # Исправлено: получаем пары из данных
         rate_key = f"{currency_code}_USD"
         
         if rate_key not in rates:
@@ -161,9 +167,6 @@ class PortfolioManager:
                 code="USD"
             )
         
-        # Сохраняем старый баланс, 
-        # это легаси, мб пригодится потом, пока не буду убирать
-        old_usd_balance = usd_wallet.balance
         usd_wallet.withdraw(cost_usd)
         
         target_wallet = portfolio.get_wallet(currency_code)
@@ -186,6 +189,7 @@ class PortfolioManager:
             "old_balance": old_target_balance,
             "new_balance": target_wallet.balance
         }
+
 
     @staticmethod
     @log_action("SELL", verbose=True)
@@ -217,7 +221,9 @@ class PortfolioManager:
                 code=currency_code
             )
         
-        rates = PortfolioManager._load_rates()
+        # Правильно загружаем курсы - получаем полные данные, затем извлекаем pairs
+        rates_data = PortfolioManager._load_rates()
+        rates = rates_data.get("pairs", {})  # Исправлено: получаем пары из данных
         rate_key = f"{currency_code}_USD"
         
         if rate_key not in rates:
@@ -229,7 +235,6 @@ class PortfolioManager:
         target_wallet.withdraw(amount)
         
         usd_wallet = portfolio.get_wallet("USD")
-        old_usd_balance = usd_wallet.balance if usd_wallet else 0.0
         
         if not usd_wallet:
             portfolio.add_currency("USD")
@@ -257,57 +262,96 @@ class PortfolioManager:
         except CurrencyNotFoundError as e:
             raise CurrencyNotFoundError(e.code)
         
-        rates = PortfolioManager._load_rates()
+        # Загружаем полные данные
+        rates_data = PortfolioManager._load_rates()
+        rates = rates_data.get("pairs", {})
+        last_refresh = rates_data.get("last_refresh")
         
-        is_stale = PortfolioManager._are_rates_stale(rates)
+        is_stale = PortfolioManager._are_rates_stale(rates_data)
         
+        # Проверяем прямой курс
         rate_key = f"{from_currency}_{to_currency}"
+        if rate_key in rates:
+            rate_data = rates[rate_key]
+            return {
+                "from_currency": from_currency,
+                "to_currency": to_currency,
+                "rate": rate_data["rate"],
+                "updated_at": rate_data.get("timestamp", last_refresh),
+                "source": rate_data["source"],
+                "inverse_rate": 1 / rate_data["rate"] if rate_data["rate"] != 0 else 0,
+                "is_fresh": not is_stale
+            }
         
-        if rate_key not in rates:
-            reverse_key = f"{to_currency}_{from_currency}"
-            if reverse_key in rates:
-                rate = 1 / rates[reverse_key]["rate"]
-                updated_at = rates[reverse_key]["updated_at"]
-                source = rates[reverse_key]["source"]
-            else:
-                raise ApiRequestError(f"Курс {from_currency}→{to_currency} недоступен")
-        else:
-            rate = rates[rate_key]["rate"]
-            updated_at = rates[rate_key]["updated_at"]
-            source = rates[rate_key]["source"]
+        # Проверяем обратный курс
+        reverse_key = f"{to_currency}_{from_currency}"
+        if reverse_key in rates:
+            rate_data = rates[reverse_key]
+            rate = 1 / rate_data["rate"] if rate_data["rate"] != 0 else 0
+            return {
+                "from_currency": from_currency,
+                "to_currency": to_currency,
+                "rate": rate,
+                "updated_at": rate_data.get("timestamp", last_refresh),
+                "source": rate_data["source"],
+                "inverse_rate": rate_data["rate"],
+                "is_fresh": not is_stale
+            }
         
-        return {
-            "from_currency": from_currency,
-            "to_currency": to_currency,
-            "rate": rate,
-            "updated_at": updated_at,
-            "source": source,
-            "inverse_rate": 1 / rate if rate != 0 else 0,
-            "is_fresh": not is_stale
-        }
+        # Расчет через USD (косвенный курс)
+        if from_currency != "USD" and to_currency != "USD":
+            from_to_usd_key = f"{from_currency}_USD"
+            to_to_usd_key = f"{to_currency}_USD"
+            
+            if from_to_usd_key in rates and to_to_usd_key in rates:
+                from_rate = rates[from_to_usd_key]["rate"]
+                to_rate = rates[to_to_usd_key]["rate"]
+                
+                if to_rate != 0:
+                    rate = from_rate / to_rate
+                    # Берем самый свежий timestamp
+                    timestamp1 = rates[from_to_usd_key].get("timestamp")
+                    timestamp2 = rates[to_to_usd_key].get("timestamp")
+                    updated_at = timestamp1 if timestamp1 and (not timestamp2 or timestamp1 > timestamp2) else timestamp2
+                    
+                    return {
+                        "from_currency": from_currency,
+                        "to_currency": to_currency,
+                        "rate": rate,
+                        "updated_at": updated_at or last_refresh,
+                        "source": f"{rates[from_to_usd_key]['source']}/{rates[to_to_usd_key]['source']}",
+                        "inverse_rate": 1 / rate if rate != 0 else 0,
+                        "is_fresh": not is_stale
+                    }
+        
+        raise ApiRequestError(f"Курс {from_currency}→{to_currency} недоступен. Попробуйте обновить курсы через 'update-rates'.")
 
     @staticmethod
     def _load_rates() -> Dict[str, Any]:
+        """Загружает полные данные о курсах (включая last_refresh)"""
         try:
-            rates_data = db.read_json("rates.json", {})
-            return rates_data.get("pairs", {})
+            return db.read_json("rates.json", {})
         except Exception:
-            return {}
+            return {"pairs": {}, "last_refresh": None}
 
     @staticmethod
-    def _are_rates_stale(rates: Dict[str, Any]) -> bool:
-        if not rates:
+    def _are_rates_stale(rates_data: Dict[str, Any]) -> bool:
+        """Проверяет актуальность курсов"""
+        if not rates_data or not isinstance(rates_data, dict):
             return True
         
         ttl_seconds = settings.get("rates_ttl_seconds", 300)
-        last_refresh = rates.get("last_refresh")
+        last_refresh = rates_data.get("last_refresh")
         
         if not last_refresh:
             return True
         
         try:
             from datetime import datetime
-            last_update = datetime.fromisoformat(last_refresh.replace('Z', '+00:00'))
+            # Обрабатываем разные форматы времени
+            clean_time = last_refresh.replace('Z', '+00:00') if last_refresh.endswith('Z') else last_refresh
+            last_update = datetime.fromisoformat(clean_time)
+            
             now = datetime.now()
             age = (now - last_update).total_seconds()
             return age > ttl_seconds

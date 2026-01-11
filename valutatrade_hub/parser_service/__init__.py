@@ -1,5 +1,5 @@
-from .config import ParserConfig
 from .api_clients import CoinGeckoClient, ExchangeRateApiClient
+from .config import ParserConfig
 from .storage import RatesStorage
 from .updater import RatesUpdater
 

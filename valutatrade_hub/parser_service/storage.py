@@ -2,7 +2,8 @@ import json
 import os
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, Any, List
+from typing import Any, Dict, List
+
 from .config import ParserConfig
 
 
@@ -66,12 +67,11 @@ class RatesStorage:
         
         from_currency = rate_data.get("from_currency", "")
         to_currency = rate_data.get("to_currency", "")
-        timestamp = rate_data.get("timestamp", "").replace("+00:00", "Z")
+        timestamp = rate_data.get("timestamp", "").replace("+00:00", "Z").replace(" ", "T")
         
         if from_currency and to_currency and timestamp:
-            # Формируем ID как было в тз
-            clean_timestamp = timestamp.replace(":", "").replace("-", "").replace("T", "").replace("Z", "")
-            record_id = f"{from_currency}_{to_currency}_{clean_timestamp}"
+            # Формируем ид в формате тз
+            record_id = f"{from_currency}_{to_currency}_{timestamp}"
             
             history_record = {
                 "id": record_id,

@@ -12,7 +12,7 @@ class ParserConfig:
     COINGECKO_URL: str = "https://api.coingecko.com/api/v3/simple/price"
     EXCHANGERATE_API_URL: str = "https://v6.exchangerate-api.com/v6"
     
-    # это базовая валюта как в тз
+    # это базовая валюта по тз
     BASE_FIAT_CURRENCY: str = "USD"
     
     FIAT_CURRENCIES: tuple = ("EUR", "GBP", "RUB", "JPY")

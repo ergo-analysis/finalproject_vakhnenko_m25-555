@@ -1,20 +1,13 @@
 import shlex
-import sys
 from typing import Optional
-from ..core.usecases import UserManager, PortfolioManager
-from ..core.currencies import (get_all_currencies, 
-                               FiatCurrency,
-                                CryptoCurrency)
 
+from ..core.currencies import CryptoCurrency, FiatCurrency, get_all_currencies
+from ..core.exceptions import ApiRequestError, CurrencyNotFoundError, InsufficientFundsError
+from ..core.usecases import PortfolioManager, UserManager
 from ..infra.settings import settings as app_settings
-from ..core.exceptions import (CurrencyNotFoundError, 
-                               InsufficientFundsError,
-                                ApiRequestError)
-
-from ..parser_service.storage import RatesStorage
 from ..parser_service.config import ParserConfig
+from ..parser_service.storage import RatesStorage
 from ..parser_service.updater import RatesUpdater
-
 
 
 class Interface:
@@ -67,7 +60,6 @@ class Interface:
         print("  show-rates [--currency <code>] [--top <N>]     - показать курсы из кэша")
         print("  list-currencies                                - список валют")
         print("  show-settings                                  - настройки")
-        print("  reload-settings                                - перезагрузка настроек")
         print("  help                                           - справка")
         print("  exit                                           - выход")
         print()
@@ -241,89 +233,104 @@ class Interface:
         
         return "\n".join(result)
     
-    def reload_settings(self, args: dict) -> str:
-        self.settings.reload()
-        return "Настройки перезагружены"
-    
     def update_rates(self, args: dict) -> str:
         """Обновление курсов валют"""
-        try:
-            from ..parser_service.updater import RatesUpdater
-            from ..parser_service.config import ParserConfig
+        
+        config = ParserConfig()
+        config.validate()
+        
+        updater = RatesUpdater(config)
+        source = args.get('source')
+        
+        print("INFO: Starting rates update...")
+        
+        if source in [None, "coingecko", "crypto"]:
+            print("INFO: Fetching from CoinGecko...", end=" ")
+            try:
+                #Получаем курс крипты
+                updater.coingecko_client.fetch_rates()
+                print("OK")
+            except Exception:
+                print("ERROR")
+        
+        if source in [None, "exchangerate", "fiat"]:
+            print("INFO: Fetching from ExchangeRate-API...", end=" ")
+            try:
+
+                #пполучаем курс фиатов
+                updater.exchangerate_client.fetch_rates()
+                print("OK")
+            except Exception:
+                print("ERROR")
+        
+        print("INFO: Writing rates to data/rates.json...")
+        
+        result = updater.run_update(source)
+        
+        if result["success"]:
+            message = f"Update successful. Total rates updated: {result['rates_count']}."
+            if result.get('last_refresh'):
+                message += f" Last refresh: {result['last_refresh']}"
+            if result.get('errors'):
+                message += f" Warnings: {', '.join(result['errors'])}"
+            return message
+        else:
+            return "Error during rates update"    
             
-            config = ParserConfig()
-            config.validate()
-            
-            updater = RatesUpdater(config)
-            source = args.get('source')
-            
-            result = updater.run_update(source)
-            
-            if result["success"]:
-                message = f"Обновление успешно. Обновлено курсов: {result['rates_count']}"
-                if result.get('last_refresh'):
-                    message += f"\nВремя обновления: {result['last_refresh']}"
-                if result.get('errors'):
-                    message += f"\nПредупреждения: {', '.join(result['errors'])}"
-                return message
-            else:
-                return "Ошибка при обновлении курсов"
-                
-        except ValueError as e:
-            return f"Ошибка конфигурации: {e}"
-        except Exception as e:
-            return f"Ошибка при обновлении курсов: {e}"
     
     def show_rates(self, args: dict) -> str:
         """Показать курсы из кэша"""
-        try:
-            from ..parser_service.storage import RatesStorage
-            from ..parser_service.config import ParserConfig
-            
-            config = ParserConfig()
-            storage = RatesStorage(config)
-            current_data = storage.load_current_rates()
-            
-            if not current_data.get("pairs"):
-                return "Локальный кэш курсов пуст. Выполните 'update-rates' для загрузки данных."
-            
-            pairs = current_data["pairs"]
-            filtered_pairs = {}
-            
-            # Фильтрация по валюте
-            if 'currency' in args and args['currency']:
-                currency = args['currency'].upper()
-                for pair, data in pairs.items():
-                    if pair.startswith(currency + "_") or pair.endswith("_" + currency):
-                        filtered_pairs[pair] = data
-            else:
-                filtered_pairs = pairs
-            
-            # Сортировка по курсу
-            sorted_pairs = sorted(
-                filtered_pairs.items(),
-                key=lambda x: x[1].get("rate", 0),
-                reverse=True
-            )
-            
-            # Ограничение по количеству
-            if 'top' in args and args['top']:
-                sorted_pairs = sorted_pairs[:args['top']]
-            
-            result = [f"\nКурсы из кэша (обновлено: {current_data.get('last_refresh', 'неизвестно')}):"]
-            
-            for pair, data in sorted_pairs:
-                rate = data.get("rate", 0)
-                source = data.get("source", "unknown")
-                result.append(f"  - {pair}: {rate:.6f} (источник: {source})")
-            
-            if not sorted_pairs:
-                result.append("  Нет данных, соответствующих фильтру")
-            
-            return "\n".join(result)
-            
-        except Exception as e:
-            return f"Ошибка при показе курсов: {e}"
+        
+        config = ParserConfig()
+        storage = RatesStorage(config)
+        current_data = storage.load_current_rates()
+        
+        if not current_data.get("pairs"):
+            return "Локальный кэш курсов пуст. Выполните 'update-rates' для загрузки данных."
+        
+        pairs = current_data["pairs"]
+        filtered_pairs = {}
+        
+        # Фильтрация по валюте
+        if 'currency' in args and args['currency']:
+            currency = args['currency'].upper()
+            for pair, data in pairs.items():
+                if currency in pair:
+                    filtered_pairs[pair] = data
+        else:
+            filtered_pairs = pairs
+        
+        # Сортировка по курсу для флага --top
+        sorted_pairs = sorted(
+            filtered_pairs.items(),
+            key=lambda x: x[1].get("rate", 0),
+            reverse=True
+        )
+        
+        # Ограничение по количеству
+        if 'top' in args and args['top']:
+            try:
+                top_n = int(args['top'])
+                sorted_pairs = sorted_pairs[:top_n]
+            except ValueError:
+                return "Ошибка: значение --top должно быть числом"
+        
+        result = [f"\nКурсы из кэша (обновлено: {current_data.get('last_refresh', 'неизвестно')}):"]
+        result.append("-" * 80)
+        result.append(f"{'Пара':<15} {'Курс':<15} {'Источник':<15} {'Время обновления':<20}")
+        result.append("-" * 80)
+        
+        for pair, data in sorted_pairs:
+            rate = data.get("rate", 0)
+            source = data.get("source", "unknown")
+            timestamp = data.get("timestamp", "неизвестно")
+            result.append(f"{pair:<15} {rate:<15.6f} {source:<15} {timestamp:<20}")
+        
+        if not sorted_pairs:
+            result.append("  Нет данных, соответствующих фильтру")
+        
+        result.append("-" * 80)
+        return "\n".join(result)
         
     
     def execute_command(self, command_line: str) -> str:
@@ -349,9 +356,7 @@ class Interface:
                 "update-rates": self.update_rates,  
                 "show-rates": self.show_rates,      
                 "list-currencies": self.list_currencies,
-                "show-settings": self.show_settings,
-                "reload-settings": self.reload_settings,
-            }
+                "show-settings": self.show_settings            }
             
             if command == "help":
                 self.show_help()

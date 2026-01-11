@@ -1,9 +1,10 @@
-import requests
-import time
 from datetime import datetime
-from typing import Dict, Any
-from .config import ParserConfig
+from typing import Any, Dict
+
+import requests
+
 from ..core.exceptions import ApiRequestError
+from .config import ParserConfig
 
 
 class BaseApiClient:
@@ -41,7 +42,6 @@ class CoinGeckoClient(BaseApiClient):
         }
         
         try:
-            start_time = time.time()
             response = requests.get(
                 url, 
                 params=params, 
@@ -85,7 +85,6 @@ class ExchangeRateApiClient(BaseApiClient):
         url = f"{self.config.EXCHANGERATE_API_URL}/{self.config.EXCHANGERATE_API_KEY}/latest/{self.config.BASE_FIAT_CURRENCY}"
         
         try:
-            start_time = time.time()
             response = requests.get(url, timeout=self.config.REQUEST_TIMEOUT)
             response.raise_for_status()
             
@@ -96,7 +95,7 @@ class ExchangeRateApiClient(BaseApiClient):
                 raise ApiRequestError(f"ExchangeRate-API error: {data.get('error-type', 'Unknown error')}")
             
             rates = {}
-            # Преобразуем время из формата "Sat, 10 Jan 2026 00:00:01 +0000" в ISO
+            # Преобразуем время в ISO
             timestamp_raw = data.get("time_last_update_utc", "")
             try:
                 dt = datetime.strptime(timestamp_raw, "%a, %d %b %Y %H:%M:%S %z")
@@ -109,7 +108,7 @@ class ExchangeRateApiClient(BaseApiClient):
             for target_currency in self.config.FIAT_CURRENCIES:
                 if target_currency in conversion_rates:
                     rate_key = f"{target_currency}_{self.config.BASE_FIAT_CURRENCY}"
-                    # Конвертируем курс (из USD→target в target→USD)
+                    # Конвертируем курс 
                     rate = 1 / float(conversion_rates[target_currency])
                     rates[rate_key] = {
                         "rate": rate,

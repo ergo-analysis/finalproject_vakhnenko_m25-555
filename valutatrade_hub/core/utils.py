@@ -1,9 +1,8 @@
+import hashlib
 import json
 import os
-from datetime import datetime
-from typing import Optional
 import secrets
-import hashlib
+from typing import Optional
 
 
 def generate_salt() -> str:
