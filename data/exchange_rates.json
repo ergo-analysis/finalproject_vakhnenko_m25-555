@@ -1,0 +1,906 @@
+[
+  {
+    "id": "BTC_USD_2026-01-11T05:39:42.480898Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90534.0,
+    "timestamp": "2026-01-11T05:39:42.480898Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 115,
+      "status_code": 200,
+      "etag": "W/\"5ff18cf70a71c9173ff83d971f6a83be\"",
+      "saved_at": "2026-01-11T05:39:42.679516Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T05:39:42.480898Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3088.98,
+    "timestamp": "2026-01-11T05:39:42.480898Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 115,
+      "status_code": 200,
+      "etag": "W/\"5ff18cf70a71c9173ff83d971f6a83be\"",
+      "saved_at": "2026-01-11T05:39:42.697218Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T05:39:42.480898Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.43,
+    "timestamp": "2026-01-11T05:39:42.480898Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 115,
+      "status_code": 200,
+      "etag": "W/\"5ff18cf70a71c9173ff83d971f6a83be\"",
+      "saved_at": "2026-01-11T05:39:42.712373Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T05:39:42.480898Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390158,
+    "timestamp": "2026-01-11T05:39:42.480898Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 115,
+      "status_code": 200,
+      "etag": "W/\"5ff18cf70a71c9173ff83d971f6a83be\"",
+      "saved_at": "2026-01-11T05:39:42.727917Z"
+    }
+  },
+  {
+    "id": "EUR_USD_2026-01-11T00:00:01Z",
+    "from_currency": "EUR",
+    "to_currency": "USD",
+    "rate": 1.1640088464672331,
+    "timestamp": "2026-01-11T00:00:01Z",
+    "source": "ExchangeRate-API",
+    "meta": {
+      "raw_data": "1 USD = 0.8591 EUR",
+      "request_ms": 262,
+      "status_code": 200,
+      "etag": "",
+      "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000",
+      "saved_at": "2026-01-11T19:12:34.013472Z"
+    }
+  },
+  {
+    "id": "GBP_USD_2026-01-11T00:00:01Z",
+    "from_currency": "GBP",
+    "to_currency": "USD",
+    "rate": 1.341381623071764,
+    "timestamp": "2026-01-11T00:00:01Z",
+    "source": "ExchangeRate-API",
+    "meta": {
+      "raw_data": "1 USD = 0.7455 GBP",
+      "request_ms": 262,
+      "status_code": 200,
+      "etag": "",
+      "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000",
+      "saved_at": "2026-01-11T19:12:34.031095Z"
+    }
+  },
+  {
+    "id": "RUB_USD_2026-01-11T00:00:01Z",
+    "from_currency": "RUB",
+    "to_currency": "USD",
+    "rate": 0.012604713658719813,
+    "timestamp": "2026-01-11T00:00:01Z",
+    "source": "ExchangeRate-API",
+    "meta": {
+      "raw_data": "1 USD = 79.3354 RUB",
+      "request_ms": 262,
+      "status_code": 200,
+      "etag": "",
+      "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000",
+      "saved_at": "2026-01-11T19:12:34.047241Z"
+    }
+  },
+  {
+    "id": "JPY_USD_2026-01-11T00:00:01Z",
+    "from_currency": "JPY",
+    "to_currency": "USD",
+    "rate": 0.006339513936787438,
+    "timestamp": "2026-01-11T00:00:01Z",
+    "source": "ExchangeRate-API",
+    "meta": {
+      "raw_data": "1 USD = 157.7408 JPY",
+      "request_ms": 262,
+      "status_code": 200,
+      "etag": "",
+      "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000",
+      "saved_at": "2026-01-11T19:12:34.063425Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T05:44:20.721010Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90559.0,
+    "timestamp": "2026-01-11T05:44:20.721010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 166,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:44:20.735849Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T05:44:20.721010Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3089.92,
+    "timestamp": "2026-01-11T05:44:20.721010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 166,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:44:20.749758Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T05:44:20.721010Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.42,
+    "timestamp": "2026-01-11T05:44:20.721010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 166,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:44:20.763681Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T05:44:20.721010Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390109,
+    "timestamp": "2026-01-11T05:44:20.721010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 166,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:44:20.777034Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T05:45:15.773010Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90559.0,
+    "timestamp": "2026-01-11T05:45:15.773010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 108,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:45:15.785445Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T05:45:15.773010Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3089.92,
+    "timestamp": "2026-01-11T05:45:15.773010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 108,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:45:15.799235Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T05:45:15.773010Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.42,
+    "timestamp": "2026-01-11T05:45:15.773010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 108,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:45:15.812838Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T05:45:15.773010Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390109,
+    "timestamp": "2026-01-11T05:45:15.773010Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 108,
+      "status_code": 200,
+      "etag": "W/\"bb11b544815b7efd6dbe496fce28cf78\"",
+      "saved_at": "2026-01-11T05:45:15.826259Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T05:46:50.282851Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90573.0,
+    "timestamp": "2026-01-11T05:46:50.282851Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"78be6d4dbad4244107c9c82dd54d9475\"",
+      "saved_at": "2026-01-11T05:46:50.298155Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T05:46:50.282851Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3089.9,
+    "timestamp": "2026-01-11T05:46:50.282851Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"78be6d4dbad4244107c9c82dd54d9475\"",
+      "saved_at": "2026-01-11T05:46:50.313776Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T05:46:50.282851Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.43,
+    "timestamp": "2026-01-11T05:46:50.282851Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"78be6d4dbad4244107c9c82dd54d9475\"",
+      "saved_at": "2026-01-11T05:46:50.327119Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T05:46:50.282851Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.39016,
+    "timestamp": "2026-01-11T05:46:50.282851Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"78be6d4dbad4244107c9c82dd54d9475\"",
+      "saved_at": "2026-01-11T05:46:50.340639Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T06:20:06.362082Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90544.0,
+    "timestamp": "2026-01-11T06:20:06.362082Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 105,
+      "status_code": 200,
+      "etag": "W/\"ef8ef5d1f010a9e76fdcda2a1e32e3b6\"",
+      "saved_at": "2026-01-11T06:20:06.377036Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T06:20:06.362082Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3090.65,
+    "timestamp": "2026-01-11T06:20:06.362082Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 105,
+      "status_code": 200,
+      "etag": "W/\"ef8ef5d1f010a9e76fdcda2a1e32e3b6\"",
+      "saved_at": "2026-01-11T06:20:06.391175Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T06:20:06.362082Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.41,
+    "timestamp": "2026-01-11T06:20:06.362082Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 105,
+      "status_code": 200,
+      "etag": "W/\"ef8ef5d1f010a9e76fdcda2a1e32e3b6\"",
+      "saved_at": "2026-01-11T06:20:06.405190Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T06:20:06.362082Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.389598,
+    "timestamp": "2026-01-11T06:20:06.362082Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 105,
+      "status_code": 200,
+      "etag": "W/\"ef8ef5d1f010a9e76fdcda2a1e32e3b6\"",
+      "saved_at": "2026-01-11T06:20:06.419120Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T06:38:35.218199Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90585.0,
+    "timestamp": "2026-01-11T06:38:35.218199Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 114,
+      "status_code": 200,
+      "etag": "W/\"b2208be6faa240c84a70e346a8e01602\"",
+      "saved_at": "2026-01-11T06:38:35.439890Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T06:38:35.218199Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3091.7,
+    "timestamp": "2026-01-11T06:38:35.218199Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 114,
+      "status_code": 200,
+      "etag": "W/\"b2208be6faa240c84a70e346a8e01602\"",
+      "saved_at": "2026-01-11T06:38:35.460813Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T06:38:35.218199Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.53,
+    "timestamp": "2026-01-11T06:38:35.218199Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 114,
+      "status_code": 200,
+      "etag": "W/\"b2208be6faa240c84a70e346a8e01602\"",
+      "saved_at": "2026-01-11T06:38:35.475022Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T06:38:35.218199Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.38975,
+    "timestamp": "2026-01-11T06:38:35.218199Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 114,
+      "status_code": 200,
+      "etag": "W/\"b2208be6faa240c84a70e346a8e01602\"",
+      "saved_at": "2026-01-11T06:38:35.489100Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T08:03:06.457833Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90670.0,
+    "timestamp": "2026-01-11T08:03:06.457833Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 129,
+      "status_code": 200,
+      "etag": "W/\"67f4c42937bf80a2d97c783e35685d4c\"",
+      "saved_at": "2026-01-11T08:03:06.472272Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T08:03:06.457833Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3094.19,
+    "timestamp": "2026-01-11T08:03:06.457833Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 129,
+      "status_code": 200,
+      "etag": "W/\"67f4c42937bf80a2d97c783e35685d4c\"",
+      "saved_at": "2026-01-11T08:03:06.493138Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T08:03:06.457833Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.37,
+    "timestamp": "2026-01-11T08:03:06.457833Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 129,
+      "status_code": 200,
+      "etag": "W/\"67f4c42937bf80a2d97c783e35685d4c\"",
+      "saved_at": "2026-01-11T08:03:06.508869Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T08:03:06.457833Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390503,
+    "timestamp": "2026-01-11T08:03:06.457833Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 129,
+      "status_code": 200,
+      "etag": "W/\"67f4c42937bf80a2d97c783e35685d4c\"",
+      "saved_at": "2026-01-11T08:03:06.527035Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T08:19:39.210771Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90659.0,
+    "timestamp": "2026-01-11T08:19:39.210771Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 118,
+      "status_code": 200,
+      "etag": "W/\"971040d9c2ac4068dbb7042e23b17b3f\"",
+      "saved_at": "2026-01-11T08:19:39.429500Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T08:19:39.210771Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3093.45,
+    "timestamp": "2026-01-11T08:19:39.210771Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 118,
+      "status_code": 200,
+      "etag": "W/\"971040d9c2ac4068dbb7042e23b17b3f\"",
+      "saved_at": "2026-01-11T08:19:39.445285Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T08:19:39.210771Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.4,
+    "timestamp": "2026-01-11T08:19:39.210771Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 118,
+      "status_code": 200,
+      "etag": "W/\"971040d9c2ac4068dbb7042e23b17b3f\"",
+      "saved_at": "2026-01-11T08:19:39.461084Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T08:19:39.210771Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390671,
+    "timestamp": "2026-01-11T08:19:39.210771Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 118,
+      "status_code": 200,
+      "etag": "W/\"971040d9c2ac4068dbb7042e23b17b3f\"",
+      "saved_at": "2026-01-11T08:19:39.475415Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T08:35:41.471894Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90662.0,
+    "timestamp": "2026-01-11T08:35:41.471894Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"4962ae8dee546af97b7a00aca1f17ddd\"",
+      "saved_at": "2026-01-11T08:35:41.484911Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T08:35:41.471894Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3094.06,
+    "timestamp": "2026-01-11T08:35:41.471894Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"4962ae8dee546af97b7a00aca1f17ddd\"",
+      "saved_at": "2026-01-11T08:35:41.499788Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T08:35:41.471894Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.28,
+    "timestamp": "2026-01-11T08:35:41.471894Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"4962ae8dee546af97b7a00aca1f17ddd\"",
+      "saved_at": "2026-01-11T08:35:41.514153Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T08:35:41.471894Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390321,
+    "timestamp": "2026-01-11T08:35:41.471894Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 110,
+      "status_code": 200,
+      "etag": "W/\"4962ae8dee546af97b7a00aca1f17ddd\"",
+      "saved_at": "2026-01-11T08:35:41.528385Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T09:31:45.650418Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90556.0,
+    "timestamp": "2026-01-11T09:31:45.650418Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 109,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:31:45.859322Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T09:31:45.650418Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3089.89,
+    "timestamp": "2026-01-11T09:31:45.650418Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 109,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:31:45.875269Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T09:31:45.650418Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.06,
+    "timestamp": "2026-01-11T09:31:45.650418Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 109,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:31:45.891897Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T09:31:45.650418Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.389062,
+    "timestamp": "2026-01-11T09:31:45.650418Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 109,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:31:45.905611Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T09:32:38.420175Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90556.0,
+    "timestamp": "2026-01-11T09:32:38.420175Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 125,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:32:38.762822Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T09:32:38.420175Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3089.89,
+    "timestamp": "2026-01-11T09:32:38.420175Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 125,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:32:38.784726Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T09:32:38.420175Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 81.06,
+    "timestamp": "2026-01-11T09:32:38.420175Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 125,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:32:38.800271Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T09:32:38.420175Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.389062,
+    "timestamp": "2026-01-11T09:32:38.420175Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 125,
+      "status_code": 200,
+      "etag": "W/\"4bbfd6f30b802da116f1a90199da8816\"",
+      "saved_at": "2026-01-11T09:32:38.816601Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T18:26:38.000847Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90869.0,
+    "timestamp": "2026-01-11T18:26:38.000847Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 134,
+      "status_code": 200,
+      "etag": "W/\"c9bb2c4276a015cf763f1d89860b314c\"",
+      "saved_at": "2026-01-11T18:26:38.225782Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T18:26:38.000847Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3119.73,
+    "timestamp": "2026-01-11T18:26:38.000847Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 134,
+      "status_code": 200,
+      "etag": "W/\"c9bb2c4276a015cf763f1d89860b314c\"",
+      "saved_at": "2026-01-11T18:26:38.244418Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T18:26:38.000847Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 80.87,
+    "timestamp": "2026-01-11T18:26:38.000847Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 134,
+      "status_code": 200,
+      "etag": "W/\"c9bb2c4276a015cf763f1d89860b314c\"",
+      "saved_at": "2026-01-11T18:26:38.258701Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T18:26:38.000847Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.392623,
+    "timestamp": "2026-01-11T18:26:38.000847Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 134,
+      "status_code": 200,
+      "etag": "W/\"c9bb2c4276a015cf763f1d89860b314c\"",
+      "saved_at": "2026-01-11T18:26:38.273034Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T18:29:47.768056Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90845.0,
+    "timestamp": "2026-01-11T18:29:47.768056Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 157,
+      "status_code": 200,
+      "etag": "W/\"1091ba18d1e9fc524d8868442e33151f\"",
+      "saved_at": "2026-01-11T18:29:48.078312Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T18:29:47.768056Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3118.01,
+    "timestamp": "2026-01-11T18:29:47.768056Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 157,
+      "status_code": 200,
+      "etag": "W/\"1091ba18d1e9fc524d8868442e33151f\"",
+      "saved_at": "2026-01-11T18:29:48.096338Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T18:29:47.768056Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 80.89,
+    "timestamp": "2026-01-11T18:29:47.768056Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 157,
+      "status_code": 200,
+      "etag": "W/\"1091ba18d1e9fc524d8868442e33151f\"",
+      "saved_at": "2026-01-11T18:29:48.110700Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T18:29:47.768056Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.392643,
+    "timestamp": "2026-01-11T18:29:47.768056Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 157,
+      "status_code": 200,
+      "etag": "W/\"1091ba18d1e9fc524d8868442e33151f\"",
+      "saved_at": "2026-01-11T18:29:48.124905Z"
+    }
+  },
+  {
+    "id": "BTC_USD_2026-01-11T19:12:33.599664Z",
+    "from_currency": "BTC",
+    "to_currency": "USD",
+    "rate": 90813.0,
+    "timestamp": "2026-01-11T19:12:33.599664Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "bitcoin",
+      "request_ms": 251,
+      "status_code": 200,
+      "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\"",
+      "saved_at": "2026-01-11T19:12:33.920996Z"
+    }
+  },
+  {
+    "id": "ETH_USD_2026-01-11T19:12:33.599664Z",
+    "from_currency": "ETH",
+    "to_currency": "USD",
+    "rate": 3114.1,
+    "timestamp": "2026-01-11T19:12:33.599664Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "ethereum",
+      "request_ms": 251,
+      "status_code": 200,
+      "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\"",
+      "saved_at": "2026-01-11T19:12:33.955049Z"
+    }
+  },
+  {
+    "id": "LTC_USD_2026-01-11T19:12:33.599664Z",
+    "from_currency": "LTC",
+    "to_currency": "USD",
+    "rate": 80.49,
+    "timestamp": "2026-01-11T19:12:33.599664Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "litecoin",
+      "request_ms": 251,
+      "status_code": 200,
+      "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\"",
+      "saved_at": "2026-01-11T19:12:33.980106Z"
+    }
+  },
+  {
+    "id": "ADA_USD_2026-01-11T19:12:33.599664Z",
+    "from_currency": "ADA",
+    "to_currency": "USD",
+    "rate": 0.390712,
+    "timestamp": "2026-01-11T19:12:33.599664Z",
+    "source": "CoinGecko",
+    "meta": {
+      "raw_id": "cardano",
+      "request_ms": 251,
+      "status_code": 200,
+      "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\"",
+      "saved_at": "2026-01-11T19:12:33.996817Z"
+    }
+  }
+]

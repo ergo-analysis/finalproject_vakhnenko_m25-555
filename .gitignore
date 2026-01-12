@@ -53,11 +53,10 @@ coverage.xml
 .pytest_cache/
 /cover/
 
+info.txt
+
 # Logs - игнорируем все файлы логов, но не саму директорию
 logs/
-
-# Data files - игнорируем все файлы данных, но не саму директорию
-data/
 
 # Config files (игнорируем пользовательские конфиги)
 config.json

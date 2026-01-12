@@ -1,0 +1,44 @@
+[
+  {
+    "user_id": 1,
+    "username": "test",
+    "hashed_password": "d380aa3dfe21353c811af49b48e343dc9cecdd6341c7391e212133b3019c7512",
+    "salt": "f30a2c4200a98e45",
+    "registration_date": "2026-01-08T18:53:04.385879"
+  },
+  {
+    "user_id": 2,
+    "username": "alice",
+    "hashed_password": "35e9ed35c2192f202e03a1fd86954ca7ff9caa11d650c0dc157fd9e12fc006c9",
+    "salt": "6d5bef3d34503678",
+    "registration_date": "2026-01-11T03:55:37.961805"
+  },
+  {
+    "user_id": 3,
+    "username": "ttt",
+    "hashed_password": "a8921d4673d9fd0f35db1ef4ac3ede5bfe033993348c0201fe00c4f3ad8ee0ee",
+    "salt": "66074d8762cc06dc",
+    "registration_date": "2026-01-11T06:23:32.631222"
+  },
+  {
+    "user_id": 4,
+    "username": "user",
+    "hashed_password": "c57c0d1046953e661564930e70db5bd5491fea28087254249ad6e1b556a023ed",
+    "salt": "b9242da4d9b4d104",
+    "registration_date": "2026-01-11T06:46:06.238244"
+  },
+  {
+    "user_id": 5,
+    "username": "egor",
+    "hashed_password": "a3441bb02b41308f9f292e503aa823bfdf00a33fb19f190e666bdb3814375dc9",
+    "salt": "e1f81ea4c720acd3",
+    "registration_date": "2026-01-11T08:02:12.154199"
+  },
+  {
+    "user_id": 6,
+    "username": "trader",
+    "hashed_password": "60d4b7f105f5f39cf8576b2380971eae444672e35b044f4c7bb6af30ecededf6",
+    "salt": "dffb014d57df9757",
+    "registration_date": "2026-01-11T18:26:17.000210"
+  }
+]

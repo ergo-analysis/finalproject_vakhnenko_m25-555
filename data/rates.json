@@ -1,0 +1,98 @@
+{
+  "pairs": {
+    "BTC_USD": {
+      "rate": 90813.0,
+      "timestamp": "2026-01-11T19:12:33.599664Z",
+      "source": "CoinGecko",
+      "meta": {
+        "raw_id": "bitcoin",
+        "request_ms": 251,
+        "status_code": 200,
+        "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\""
+      }
+    },
+    "ETH_USD": {
+      "rate": 3114.1,
+      "timestamp": "2026-01-11T19:12:33.599664Z",
+      "source": "CoinGecko",
+      "meta": {
+        "raw_id": "ethereum",
+        "request_ms": 251,
+        "status_code": 200,
+        "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\""
+      }
+    },
+    "LTC_USD": {
+      "rate": 80.49,
+      "timestamp": "2026-01-11T19:12:33.599664Z",
+      "source": "CoinGecko",
+      "meta": {
+        "raw_id": "litecoin",
+        "request_ms": 251,
+        "status_code": 200,
+        "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\""
+      }
+    },
+    "ADA_USD": {
+      "rate": 0.390712,
+      "timestamp": "2026-01-11T19:12:33.599664Z",
+      "source": "CoinGecko",
+      "meta": {
+        "raw_id": "cardano",
+        "request_ms": 251,
+        "status_code": 200,
+        "etag": "W/\"70156796ac7133cfaf1a9e630b797e47\""
+      }
+    },
+    "EUR_USD": {
+      "rate": 1.1640088464672331,
+      "timestamp": "2026-01-11T00:00:01+00:00",
+      "source": "ExchangeRate-API",
+      "meta": {
+        "raw_data": "1 USD = 0.8591 EUR",
+        "request_ms": 262,
+        "status_code": 200,
+        "etag": "",
+        "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000"
+      }
+    },
+    "GBP_USD": {
+      "rate": 1.341381623071764,
+      "timestamp": "2026-01-11T00:00:01+00:00",
+      "source": "ExchangeRate-API",
+      "meta": {
+        "raw_data": "1 USD = 0.7455 GBP",
+        "request_ms": 262,
+        "status_code": 200,
+        "etag": "",
+        "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000"
+      }
+    },
+    "RUB_USD": {
+      "rate": 0.012604713658719813,
+      "timestamp": "2026-01-11T00:00:01+00:00",
+      "source": "ExchangeRate-API",
+      "meta": {
+        "raw_data": "1 USD = 79.3354 RUB",
+        "request_ms": 262,
+        "status_code": 200,
+        "etag": "",
+        "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000"
+      }
+    },
+    "JPY_USD": {
+      "rate": 0.006339513936787438,
+      "timestamp": "2026-01-11T00:00:01+00:00",
+      "source": "ExchangeRate-API",
+      "meta": {
+        "raw_data": "1 USD = 157.7408 JPY",
+        "request_ms": 262,
+        "status_code": 200,
+        "etag": "",
+        "time_next_update": "Mon, 12 Jan 2026 00:00:01 +0000"
+      }
+    }
+  },
+  "last_refresh": "2026-01-11T19:12:33.873501",
+  "source": "ParserService"
+}
